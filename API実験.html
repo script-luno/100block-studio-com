@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Scratch API データの取得</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .profile { border: 1px solid #ccc; padding: 15px; border-radius: 5px; width: 300px; }
+        img { width: 60px; height: 60px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>Scratchユーザー情報</h2>
+    <div id="scratch-data" class="profile">読み込み中...</div>
+
+    <script>
+        // 取得したいScratchのユーザー名
+        const username = "ScratchCat"; 
+        
+        // Scratch公式APIのURL
+        const apiUrl = `https://mit.edu{username}`;
+        
+        // CORS回避用のプロキシURLを挟む
+        const proxyUrl = `https://allorigins.win{encodeURIComponent(apiUrl)}`;
+
+        // APIからデータを取得する関数
+        async function fetchScratchData() {
+            try {
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error('ネットワークエラーが発生しました');
+                
+                const wrapper = await response.json();
+                // alloriginsは「contents」というキーの中に文字列としてAPIの返り値を格納しているため、パースする
+                const data = JSON.parse(wrapper.contents); 
+
+                // HTMLにデータを書き出す
+                document.getElementById('scratch-data').innerHTML = `
+                    <img src="https://mit.edu{data.id}.png" alt="アバター">
+                    <h3>${data.username}</h3>
+                    <p>ユーザーID: ${data.id}</p>
+                    <p>国籍: ${data.profile.country}</p>
+                `;
+            } catch (error) {
+                console.error('エラー:', error);
+                document.getElementById('scratch-data').innerText = 'データの取得に失敗しました。';
+            }
+        }
+
+        // 実行
+        fetchScratchData();
+    </script>
+</body>
+</html>
