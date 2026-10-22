@@ -2,53 +2,92 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Scratch API データの取得</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch API Viewer</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .profile { border: 1px solid #ccc; padding: 15px; border-radius: 5px; width: 300px; }
-        img { width: 60px; height: 60px; border-radius: 5px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f9f9f9;
+            color: #333;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        h2 { margin-top: 0; color: #ffab00; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .error { color: #d32f2f; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>Scratchユーザー情報</h2>
-    <div id="scratch-data" class="profile">読み込み中...</div>
+    <div class="card">
+        <h2 id="user-title">ユーザー情報を読み込み中...</h2>
+        <p id="user-bio"></p>
+    </div>
+
+    <div class="card">
+        <h3>公開プロジェクト一覧</h3>
+        <ul id="project-list">
+            <li>読み込み中...</li>
+        </ul>
+    </div>
 
     <script>
-        // 取得したいScratchのユーザー名
-        const username = "ScratchCat"; 
-        
-        // Scratch公式APIのURL
-        const apiUrl = `https://mit.edu{username}`;
-        
-        // CORS回避用のプロキシURLを挟む
-        const proxyUrl = `https://allorigins.win{encodeURIComponent(apiUrl)}`;
-
-        // APIからデータを取得する関数
         async function fetchScratchData() {
-            try {
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('ネットワークエラーが発生しました');
-                
-                const wrapper = await response.json();
-                // alloriginsは「contents」というキーの中に文字列としてAPIの返り値を格納しているため、パースする
-                const data = JSON.parse(wrapper.contents); 
+            const username = 'weather_sunny';
+            const userUrl = `https://api.scratch.mit.edu/users/${username}`;
+            const projectsUrl = `https://api.scratch.mit.edu/users/${username}/projects`;
 
-                // HTMLにデータを書き出す
-                document.getElementById('scratch-data').innerHTML = `
-                    <img src="https://mit.edu{data.id}.png" alt="アバター">
-                    <h3>${data.username}</h3>
-                    <p>ユーザーID: ${data.id}</p>
-                    <p>国籍: ${data.profile.country}</p>
-                `;
+            try {
+                // 1. ユーザー情報の取得
+                const userRes = await fetch(userUrl);
+                if (!userRes.ok) throw new Error(`ユーザー情報の取得に失敗 (HTTP ${userRes.status})`);
+                const userData = await userRes.json();
+
+                document.getElementById('user-title').textContent = `${userData.username} のプロフィール`;
+                document.getElementById('user-bio').textContent = `国: ${userData.profile.country || '不明'} / 紹介文: ${userData.profile.bio || 'なし'}`;
+
+                // 2. プロジェクト一覧の取得
+                const projRes = await fetch(projectsUrl);
+                if (!projRes.ok) throw new Error(`プロジェクトの取得に失敗 (HTTP ${projRes.status})`);
+                const projData = await projRes.json();
+
+                const listEl = document.getElementById('project-list');
+                listEl.innerHTML = '';
+
+                if (projData.length === 0) {
+                    listEl.innerHTML = '<li>プロジェクトが見つかりませんでした。</li>';
+                    return;
+                }
+
+                projData.forEach(project => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `https://scratch.mit.edu/projects/${project.id}`;
+                    a.target = '_blank';
+                    a.textContent = project.title;
+                    li.appendChild(a);
+                    listEl.appendChild(li);
+                });
+
             } catch (error) {
-                console.error('エラー:', error);
-                document.getElementById('scratch-data').innerText = 'データの取得に失敗しました。';
+                console.error(error);
+                document.body.innerHTML += `<div class="card error">エラーが発生しました: ${error.message}</div>`;
             }
         }
 
-        // 実行
         fetchScratchData();
     </script>
+
 </body>
 </html>
