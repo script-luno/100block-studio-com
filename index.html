@@ -248,49 +248,55 @@
             ],
 
             // ⭐ 注目の作品データ (6個設定してキレイな2列レイアウトに維持)
-            // {"作品名": {"id": "Scratch作品ID", "desc": {"ja": "日本語説明", "en": "英語説明"}}}
+            // {"作品名": {"id": "Scratch作品ID", "desc": {"ja": "日本語説明", "en": "英語説明"}, "scratcher": "作者名"}}
             featuredProjects: {
                 "電卓96ブロック": {
                     "id": "1327177834",
                     "desc": {
-                        "ja": "100ブロックで作ってみた会場初の作品",
-                        "en": "The first creation at the venue, built using 100 blocks"
-                    }
+                        "ja": "四則計算と累乗と余りを計算できます!",
+                        "en": "You can perform basic arithmetic, exponentiation, and remainder calculations!"
+                    },
+                    "scratcher": "Script_luno"
                 },
                 "階乗演算 100block var": {
                     "id": "1351209275",
                     "desc": {
-                        "ja": "大きい数の階乗が計算できる作品",
-                        "en": "A program capable of calculating the factorials of large numbers"
-                    }
+                        "ja": "大きい数の階乗ができる作品です",
+                        "en": "This project allows for the calculation of factorials of large numbers."
+                    },
+                    "scratcher": "Script_luno"
                 },
-                "ミニシューティング": {
-                    "id": "857572782",
+                "何時何分何十何秒地球が何回回ったかを見る作品": {
+                    "id": "1368480280",
                     "desc": {
-                        "ja": "少ないブロック数でもしっかり遊べる爽快なシューティングゲーム。",
-                        "en": "An exciting shooting game with smooth controls in minimal blocks."
-                    }
+                        "ja": "地球が生まれてから約何回ってるかが分かります!",
+                        "en": "You can find out approximately how many times the Earth has rotated since it was formed!"
+                    },
+                    "scratcher": "Script_luno"
                 },
-                "物理エンジンシミュレーター": {
-                    "id": "857572782",
+                "ライフゲーム": {
+                    "id": "1380399175",
                     "desc": {
-                        "ja": "重力や跳ね返りを計算する軽量な物理演算デモ。",
-                        "en": "Lightweight physics demo calculating gravity and bounce."
-                    }
+                        "ja": "17*17マスのライフゲームができます!!",
+                        "en": "You can play Conway's Game of Life on a 17x17 grid!!"
+                    },
+                    "scratcher": "Script_luno"
                 },
-                "100ブロックメモ帳": {
-                    "id": "857572782",
+                "ニューラルではないAi": {
+                    "id": "1383222333",
                     "desc": {
-                        "ja": "テキストの入力と表示ができるアイデア作品！",
-                        "en": "A creative project allowing text input and display!"
-                    }
+                        "ja": "Aiがゴールを求めて移動します!",
+                        "en": "Ai moves in search of the goal!"
+                    },
+                    "scratcher": "Script_luno"
                 },
-                "ドット絵エディター": {
-                    "id": "857572782",
+                "注目の作品募集中": {
+                    "id": "1383222333",
                     "desc": {
-                        "ja": "100ブロック以内で描画と消去ができるシンプルなドット絵ツール。",
-                        "en": "A simple pixel art tool that allows drawing and erasing in under 100 blocks."
-                    }
+                        "ja": "作品を募集中!スタジオのコメント欄で教えてね!",
+                        "en": "We’re looking for submissions! Let us know in the studio’s comments section!"
+                    },
+                    "scratcher": "Script_luno"
                 }
             },
 
@@ -472,18 +478,20 @@
 
             for (const [title, details] of Object.entries(projects)) {
                 const desc = details.desc ? (details.desc[lang] || details.desc['ja'] || '') : '';
+                const author = details.scratcher ? details.scratcher : '';
                 const url = `https://scratch.mit.edu/projects/${details.id}/`;
 
                 html += `
                 <a href="${url}" target="_blank" rel="noopener noreferrer" class="group bg-slate-50 hover:bg-emerald-50/50 border border-slate-200/80 hover:border-emerald-300 rounded-xl p-4 transition duration-200 flex flex-col justify-between shadow-sm hover:shadow">
                     <div>
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between mb-1">
                             <h3 class="font-bold text-slate-800 group-hover:text-emerald-700 transition text-base sm:text-lg flex items-center space-x-1.5">
                                 <span>🧩</span>
                                 <span>${title}</span>
                             </h3>
                             <span class="text-slate-400 group-hover:text-emerald-600 transition text-xs font-bold shrink-0 ml-2">↗</span>
                         </div>
+                        ${author ? `<p class="text-[11px] font-semibold text-emerald-600/90 mb-2 flex items-center space-x-1"><span>👤</span><span>by ${author}</span></p>` : ''}
                         <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">${desc}</p>
                     </div>
                 </a>
