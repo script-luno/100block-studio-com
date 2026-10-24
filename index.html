@@ -3,91 +3,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scratch API Viewer</title>
+    <title id="pageTitle">100ブロックで作ってみた会場.com</title>
+    <!-- ファビコン (提供されたロゴ画像をSVGデータ形式で埋め込み) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%20ff8c00'/%3E%3Crect x='13.3' y='13.3' width='73.4' height='73.4' fill='%23ffffff'/%3E%3Crect x='23.3' y='23.3' width='53.4' height='53.4' fill='%23000000'/%3E%3Crect x='36.6' y='36.6' width='26.8' height='26.8' fill='%23ffffff'/%3E%3Crect x='76.7' y='36.6' width='23.3' height='26.8' fill='%23000000'/%3E%3C/svg%3E">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN (グラフ表示用) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 0 20px;
-            background: #f9f9f9;
-            color: #333;
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE / Edge */
+            user-select: none;         /* 標準 */
         }
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        h2 { margin-top: 0; color: #ffab00; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 8px; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .error { color: #d32f2f; font-weight: bold; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col" ondragstart="return false;">
 
-    <div class="card">
-        <h2 id="user-title">ユーザー情報を読み込み中...</h2>
-        <p id="user-bio"></p>
-    </div>
+    <!-- ヘッダー -->
+    <header class="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🧩</span>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-wider drop-shadow-sm" data-i18n="siteTitle">100ブロックで作ってみた会場</h1>
+            </div>
+            
+            <!-- 言語切り替え選択 -->
+            <div class="flex items-center space-x-2 bg-white/20 backdrop-blur-md rounded-xl p-1 border border-white/30">
+                <button id="langJaBtn" onclick="switchLanguage('ja')" class="px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm">
+                    日本語
+                </button>
+                <button id="langEnBtn" onclick="switchLanguage('en')" class="px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20">
+                    English
+                </button>
+            </div>
+        </div>
+    </header>
 
-    <div class="card">
-        <h3>公開プロジェクト一覧</h3>
-        <ul id="project-list">
-            <li>読み込み中...</li>
-        </ul>
+    <!-- メインコンテンツ -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8 space-y-8">
+
+        <!-- キャッチコピー＆説明 -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 text-center space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800" data-i18n="heroTitle">
+                技術とアイデアの限界に挑戦！
+            </h2>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto" data-i18n="heroDesc">
+                限られた「100ブロック」の中で、どこまですごい作品を作れるか？みんなのアイデアが集まるScratch公式スタジオへようこそ！
+            </p>
+        </section>
+
+        <!-- ルールのクイックサマリー＆案内 -->
+        <section class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div class="flex items-start space-x-4">
+                <div class="text-3xl sm:text-4xl bg-amber-200 p-3 rounded-xl shrink-0">⚠️</div>
+                <div class="flex-1 min-w-0">
+                    <h2 class="text-lg sm:text-xl font-bold text-amber-900 mb-3 leading-snug" data-i18n="ruleNoticeTitle">
+                        参加する前に、必ずこちらの詳しいルールをご確認ください！
+                    </h2>
+                    
+                    <!-- 短いまとめ -->
+                    <div class="bg-white/90 backdrop-blur rounded-xl p-4 mb-4 text-slate-700 text-sm sm:text-base space-y-2 border border-amber-100 shadow-sm">
+                        <p class="font-bold text-amber-800 flex items-center space-x-1" data-i18n="summaryHeading">
+                            📌 かんたんまとめ
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-600 pl-1 text-sm sm:text-base">
+                            <li data-i18n="summary1">対象：<strong>100ブロック以下</strong>の技術的な作品</li>
+                            <li data-i18n="summary2">NG例：101ブロック以上、プログラム無し、画像切り替えのみ、1歩動かすだけなどシンプルすぎるもの</li>
+                            <li data-i18n="summary3">コメント・宣伝：100ブロック化の相談、スタジオ内作品の宣伝、雑談・依頼は自由です！</li>
+                        </ul>
+                    </div>
+
+                    <!-- 全文を開くボタン -->
+                    <button onclick="toggleRuleModal()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold px-6 py-3 rounded-xl shadow transition flex items-center justify-center space-x-2">
+                        <span data-i18n="readFullRulesBtn">📜 詳しいルール全文を読む</span>
+                        <span class="text-xl">▾</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- スタジオの機能・特徴カード -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+                <div>
+                    <div class="text-3xl mb-3">🛠️</div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2" data-i18n="card1Title">100ブロック化『挑戦中』の相談OK</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed" data-i18n="card1Desc">
+                        「あと少しブロックを削りたい…」という未完成の作品は、スタジオのコメント欄にURLを貼って気軽に相談してね！
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+                <div>
+                    <div class="text-3xl mb-3">💬</div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2" data-i18n="card2Title">宣伝・雑談も自由に！</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed" data-i18n="card2Desc">
+                        作品の宣伝は当スタジオに追加されている作品ならご自由にどうぞ。雑談や依頼もスタジオのコメント欄で楽しく盛り上がりましょう！
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1週間の平均増加ペーストピックス -->
+        <section class="bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+            <div class="flex items-center space-x-3 border-b border-white/20 pb-3">
+                <span class="text-2xl sm:text-3xl">⚡</span>
+                <h2 class="text-xl sm:text-2xl font-bold" data-i18n="statsTitle">スタジオの成長スピード（1週間の平均ペース）</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-center">
+                    <p class="text-xs sm:text-sm text-cyan-100 mb-1" data-i18n="weeklyProjectsLabel">1週間の平均作品増加数</p>
+                    <p class="text-2xl sm:text-3xl font-extrabold text-amber-300">約 3.2 <span class="text-base font-normal text-white" data-i18n="unitProjects">作品 / 週</span></p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-center">
+                    <p class="text-xs sm:text-sm text-cyan-100 mb-1" data-i18n="weeklyCommentsLabel">1週間の平均コメント増加数</p>
+                    <p class="text-2xl sm:text-3xl font-extrabold text-amber-300">約 7.5 <span class="text-base font-normal text-white" data-i18n="unitComments">件 / 週</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成長グラフ（作品数＆コメント数推移） -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-4">
+            <div class="flex items-center space-x-3 border-b border-slate-100 pb-4">
+                <span class="text-2xl sm:text-3xl">📈</span>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800" data-i18n="chartTitle">
+                    作品数・コメント数の成長グラフ
+                </h2>
+            </div>
+            <div class="w-full h-64 sm:h-80 relative">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </section>
+
+        <!-- スタジオの歴史（タイムライン） -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-6">
+            <div class="flex items-center space-x-3 border-b border-slate-100 pb-4">
+                <span class="text-2xl sm:text-3xl">📜</span>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800" data-i18n="historyTitle">
+                    スタジオの歴史
+                </h2>
+            </div>
+
+            <!-- タイムライン項目（時系列順） -->
+            <div class="relative border-l-2 border-emerald-400 ml-4 pl-6 space-y-6">
+                <!-- JavaScriptで動的に生成 -->
+            </div>
+        </section>
+
+        <!-- アクション（はじめよう！ボタン） -->
+        <section class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-8 text-center text-white shadow-lg space-y-4 my-8 transform hover:scale-[1.01] transition duration-300">
+            <h2 class="text-2xl sm:text-3xl font-extrabold" data-i18n="ctaTitle">作品の投稿・閲覧はこちらから！</h2>
+            <p class="text-emerald-100 text-sm sm:text-base max-w-xl mx-auto" data-i18n="ctaDesc">
+                さあ、あなたも100ブロックの限界にチャレンジしてみよう！
+            </p>
+            <div class="pt-2">
+                <a href="https://scratch.mit.edu/studios/51700333" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center space-x-2 bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-lg sm:text-xl px-10 py-4 rounded-full shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1">
+                    <span data-i18n="ctaBtn">🚀 はじめよう！</span>
+                    <span class="text-sm opacity-80">↗</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- 注目の作品セクション -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-6">
+            <div class="space-y-2 border-b border-slate-100 pb-4">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl sm:text-3xl">⭐</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800" data-i18n="featuredTitle">
+                        注目の作品
+                    </h2>
+                </div>
+                <!-- 丁寧な説明文 -->
+                <p class="text-slate-600 text-xs sm:text-sm bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 leading-relaxed" data-i18n="featuredNotice">
+                    ※基本的にScript_lunoの作品を中心に掲載しておりますが、「自分の作品も掲載してほしい！」という方は、スタジオのコメント欄にてお気軽にお知らせください。また、こちらから掲載のお願いをさせていただく場合もございます。
+                </p>
+            </div>
+
+            <!-- 注目の作品一覧リスト (6つの作品でキレイな2列グリッド) -->
+            <div id="featuredProjectsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- JavaScriptで動的に生成 -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm mt-12">
+        <p>© 100ブロックで作ってみた会場 Studio Community</p>
+        <p class="mt-2 text-xs text-slate-500">This site is inspired by Scratch community guidelines.</p>
+    </footer>
+
+    <!-- ルール全文モーダル -->
+    <div id="ruleModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <!-- モーダルヘッダー -->
+            <div class="bg-slate-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-lg font-bold flex items-center space-x-2">
+                    <span>📜</span>
+                    <span data-i18n="modalTitle">スタジオルール全文</span>
+                </h3>
+                <button onclick="toggleRuleModal()" class="text-slate-400 hover:text-white text-2xl font-bold px-2">&times;</button>
+            </div>
+
+            <!-- モーダル本文（スクロール可能） -->
+            <div class="p-6 overflow-y-auto space-y-6 text-slate-700 text-sm sm:text-base leading-relaxed" id="modalContent">
+                <!-- JavaScriptで言語に応じて動的表示 -->
+            </div>
+
+            <!-- モーダルフッター -->
+            <div class="bg-slate-100 px-6 py-3 flex justify-end">
+                <button onclick="toggleRuleModal()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-5 py-2 rounded-xl transition" data-i18n="closeBtn">
+                    閉じる
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        async function fetchScratchData() {
-            const username = 'weather_sunny';
-            const userUrl = `https://api.scratch.mit.edu/users/${username}`;
-            const projectsUrl = `https://api.scratch.mit.edu/users/${username}/projects`;
+        // =========================================================================
+        // ✏️ 手動で簡単に書き換えられるデータ設定エリア (STUDIO_DATA)
+        // ここを編集するだけで、歴史一覧・グラフ・1週間の平均数がすべて自動更新されます！
+        // =========================================================================
+        const STUDIO_DATA = {
+            // 📜 スタジオの歴史データ
+            history: [
+                { date: "6月1日", ja: "スタジオ作成 ＆ 初めての作品「電卓96ブロック」を追加！", en: "Studio Created & First Project '96-block Calculator' Added!" },
+                { date: "8月XX日", ja: "スタジオルール変更", en: "Studio Rules Updated" },
+                { date: "8月XX日", ja: "作品数が10個に！", en: "Reached 10 Projects!" },
+                { date: "9月9日", ja: "作品数が20個に!!", en: "Reached 20 Projects!!" },
+                { date: "9月15日", ja: "コメント数が60に!!", en: "Reached 60 Comments!!" },
+                { date: "9月16日", ja: "スタジオのフォロー10人になり100ブロック公式サイトを作成！", en: "Reached 10 Followers & Created Official Website!" },
+                { date: "9月17日", ja: "コメント数が50に！", en: "Reached 50 Comments!" },
+                { date: "9月20日", ja: "作品数が30個に!!", en: "Reached 30 Projects!!" },
+                { date: "9月29日", ja: "スタジオ参加者が5人に！", en: "Reached 5 Studio Members!" },
+                { date: "9月30日", ja: "コメント数が70に!!", en: "Reached 70 Comments!!" },
+                { date: "10月9日", ja: "作品数が50に！ 🎉", en: "Reached 50 Projects! 🎉" },
+                { date: "10月11日", ja: "コメント数が80に!!", en: "Reached 80 Comments!!" },
+                { date: "10月20日", ja: "コメント数が90に!! 💬", en: "Reached 90 Comments!! 💬" }
+            ],
 
-            try {
-                // 1. ユーザー情報の取得
-                const userRes = await fetch(userUrl);
-                if (!userRes.ok) throw new Error(`ユーザー情報の取得に失敗 (HTTP ${userRes.status})`);
-                const userData = await userRes.json();
-
-                document.getElementById('user-title').textContent = `${userData.username} のプロフィール`;
-                document.getElementById('user-bio').textContent = `国: ${userData.profile.country || '不明'} / 紹介文: ${userData.profile.bio || 'なし'}`;
-
-                // 2. プロジェクト一覧の取得
-                const projRes = await fetch(projectsUrl);
-                if (!projRes.ok) throw new Error(`プロジェクトの取得に失敗 (HTTP ${projRes.status})`);
-                const projData = await projRes.json();
-
-                const listEl = document.getElementById('project-list');
-                listEl.innerHTML = '';
-
-                if (projData.length === 0) {
-                    listEl.innerHTML = '<li>プロジェクトが見つかりませんでした。</li>';
-                    return;
+            // ⭐ 注目の作品データ (6個設定してキレイな2列レイアウトに維持)
+            // {"作品名": {"id": "Scratch作品ID", "desc": {"ja": "日本語説明", "en": "英語説明"}}}
+            featuredProjects: {
+                "電卓96ブロック": {
+                    "id": "857572782",
+                    "desc": {
+                        "ja": "わずか96ブロックで実装された超高性能な電卓作品！",
+                        "en": "A highly functional calculator implemented in just 96 blocks!"
+                    }
+                },
+                "100ブロック時計": {
+                    "id": "857572782",
+                    "desc": {
+                        "ja": "リアルタイムで正確な時間を刻むスタイリッシュなデジタル時計。",
+                        "en": "A stylish digital clock that keeps accurate real-time."
+                    }
+                },
+                "ミニシューティング": {
+                    "id": "857572782",
+                    "desc": {
+                        "ja": "少ないブロック数でもしっかり遊べる爽快なシューティングゲーム。",
+                        "en": "An exciting shooting game with smooth controls in minimal blocks."
+                    }
+                },
+                "物理エンジンシミュレーター": {
+                    "id": "857572782",
+                    "desc": {
+                        "ja": "重力や跳ね返りを計算する軽量な物理演算デモ。",
+                        "en": "Lightweight physics demo calculating gravity and bounce."
+                    }
+                },
+                "100ブロックメモ帳": {
+                    "id": "857572782",
+                    "desc": {
+                        "ja": "テキストの入力と表示ができるアイデア作品！",
+                        "en": "A creative project allowing text input and display!"
+                    }
+                },
+                "ドット絵エディター": {
+                    "id": "857572782",
+                    "desc": {
+                        "ja": "100ブロック以内で描画と消去ができるシンプルなドット絵ツール。",
+                        "en": "A simple pixel art tool that allows drawing and erasing in under 100 blocks."
+                    }
                 }
+            },
 
-                projData.forEach(project => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = `https://scratch.mit.edu/projects/${project.id}`;
-                    a.target = '_blank';
-                    a.textContent = project.title;
-                    li.appendChild(a);
-                    listEl.appendChild(li);
-                });
+            // 📈 作品数の推移データ {"日付": 数値}
+            projects: {
+                "6/1": 1,
+                "8/?": 10,
+                "9/9": 20,
+                "9/16": 23,
+                "9/20": 30,
+                "9/30": 38,
+                "10/9": 50,
+                "10/20": 56
+            },
 
-            } catch (error) {
-                console.error(error);
-                document.body.innerHTML += `<div class="card error">エラーが発生しました: ${error.message}</div>`;
+            // 📈 コメント数の推移データ {"日付": 数値}
+            comments: {
+                "6/1": 0,
+                "8/?": 20,
+                "9/15": 60,
+                "9/17": 50,
+                "9/30": 70,
+                "10/11": 80,
+                "10/20": 90
             }
+        };
+
+        // 多言語テキストの基本辞書定義
+        const i18nData = {
+            ja: {
+                pageTitle: "100ブロックで作ってみた会場.com",
+                siteTitle: "100ブロックで作ってみた会場",
+                heroTitle: "技術とアイデアの限界に挑戦！",
+                heroDesc: "限られた「100ブロック」の中で、どこまですごい作品を作れるか？みんなのアイデアが集まるScratch公式スタジオへようこそ！",
+                ruleNoticeTitle: "参加する前に、必ずこちらの詳しいルールをご確認ください！",
+                summaryHeading: "📌 かんたんまとめ",
+                summary1: "対象：<strong>100ブロック以下</strong>の技術的な作品",
+                summary2: "NG例：101ブロック以上、プログラム無し、画像切り替えのみ、1歩動かすだけなどシンプルすぎるもの",
+                summary3: "コメント・宣伝：100ブロック化の相談、スタジオ内作品の宣伝、雑談・依頼は自由です！",
+                readFullRulesBtn: "📜 詳しいルール全文を読む",
+                card1Title: "100ブロック化『挑戦中』の相談OK",
+                card1Desc: "「あと少しブロックを削りたい…」という未完成の作品は、スタジオのコメント欄にURLを貼って気軽に相談してね！",
+                card2Title: "宣伝・雑談も自由に！",
+                card2Desc: "作品の宣伝は当スタジオに追加されている作品ならご自由にどうぞ。雑談や依頼もスタジオのコメント欄で楽しく盛り上がりましょう！",
+                statsTitle: "スタジオの成長スピード（1週間の平均ペース）",
+                weeklyProjectsLabel: "1週間の平均作品増加数",
+                weeklyCommentsLabel: "1週間の平均コメント増加数",
+                unitProjects: "作品 / 週",
+                unitComments: "件 / 週",
+                chartTitle: "作品数・コメント数の成長グラフ",
+                historyTitle: "スタジオの歴史",
+                ctaTitle: "作品の投稿・閲覧はこちらから！",
+                ctaDesc: "さあ、あなたも100ブロックの限界にチャレンジしてみよう！",
+                ctaBtn: "🚀 はじめよう！",
+                modalTitle: "スタジオルール全文",
+                closeBtn: "閉じる",
+                chartLabelProjects: "作品数",
+                chartLabelComments: "コメント数",
+                featuredTitle: "注目の作品",
+                featuredNotice: "※基本的にScript_lunoの作品を中心に掲載しておりますが、「自分の作品も掲載してほしい！」という方は、スタジオのコメント欄にてお気軽にお知らせください。また、こちらから掲載のお願いをさせていただく場合もございます。",
+                modalBody: `
+                    <div class="space-y-5">
+                        <!-- 第1条 -->
+                        <div class="space-y-4">
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                                <h4 class="font-bold text-amber-900 mb-2">スタジオルール第1条 参加ルールについて</h4>
+                                <p class="font-semibold text-amber-800 text-sm">第一項 スタジオについて</p>
+                                <p class="text-xs text-amber-700">このスタジオは、100ブロック以下の技術的な作品を入れるスタジオである。</p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第二項 外す基準・外す場合の行動について</h5>
+                                <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
+                                    <li>101ブロック以上/プログラム無し/画像の切り替えのみ/1歩動かす/回転のみ/音楽のみ等のシンプルすぎるものはスタジオから外す対象になります。</li>
+                                    <li>対象作品を見つけた場合、その作品のコメント欄に報告し、1週間反応がない場合スタジオから外させてもらいます。（コメント欄閉鎖時等は「100ブロックで作ってみた会場 報告用作品」へ報告）</li>
+                                    <li>今後スタジオのルールの変更をする場合があります。ルール変更前にスタジオのコメント欄にコメントして、投稿から1週間後に変更します。</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第三項 コメントについて</h5>
+                                <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
+                                    <li>100ブロック化『挑戦中』の相談OK！未完成作品のURLを貼って相談してね！</li>
+                                    <li>作品の宣伝は当スタジオに追加されている作品なら自由です。</li>
+                                    <li>雑談や依頼もご自由にどうぞ。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 第一条と第二条の間の区切り線 -->
+                        <div class="relative py-2 flex items-center justify-center">
+                            <div class="border-t-2 border-dashed border-slate-200 w-full"></div>
+                        </div>
+
+                        <!-- 第2条 -->
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                                <h4 class="font-bold text-blue-900 mb-1">スタジオルール第2条 キュレーター・マネージャーについて</h4>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第一項 作品の追加について</h5>
+                                <p class="text-xs text-slate-600 pl-1">作品の追加は誰でもルールを守れば自由です。</p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第二項 キュレーター・マネージャーの仕事</h5>
+                                <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
+                                    <li>キュレーター・マネージャーの仕事は任意とし、作品追加時のルール確認等を行っていただけると助かります。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            en: {
+                pageTitle: "Made with 100 Blocks Studio.com",
+                siteTitle: "Made with 100 Blocks Studio",
+                heroTitle: "Challenge the Limits of Tech & Ideas!",
+                heroDesc: "How amazing of a project can you build using 100 blocks or less? Welcome to the official Scratch studio packed with everyone's creative ideas!",
+                ruleNoticeTitle: "Please make sure to check the detailed rules below before joining!",
+                summaryHeading: "📌 Quick Summary",
+                summary1: "Requirement: Technical projects with <strong>100 blocks or less</strong>.",
+                summary2: "Not Allowed: 101+ blocks, no scripts, image-switching only, simple 1-step move, single rotation, music-only, or overly simple projects.",
+                summary3: "Comments & Promo: You can ask for optimization help, promote projects already in this studio, chat, or request projects freely!",
+                readFullRulesBtn: "📜 Read Full Rules",
+                card1Title: "Optimization Help Allowed",
+                card1Desc: "Working on cutting down blocks? Share your work-in-progress link in the studio comments and get feedback from others!",
+                card2Title: "Feel Free to Chat & Promote",
+                card2Desc: "You can promote projects that are already added to this studio. Friendly chat and collaboration requests are also welcome in the studio comments!",
+                statsTitle: "Studio Growth Pace (Weekly Average)",
+                weeklyProjectsLabel: "Avg. Projects Added / Week",
+                weeklyCommentsLabel: "Avg. Comments Added / Week",
+                unitProjects: "projects / wk",
+                unitComments: "comments / wk",
+                chartTitle: "Growth Chart (Projects & Comments)",
+                historyTitle: "Studio History",
+                ctaTitle: "Join & Explore Projects!",
+                ctaDesc: "Come on and push your limits with 100 blocks!",
+                ctaBtn: "🚀 Let's Start!",
+                modalTitle: "Full Studio Rules",
+                closeBtn: "Close",
+                chartLabelProjects: "Projects",
+                chartLabelComments: "Comments",
+                featuredTitle: "Featured Projects",
+                featuredNotice: "*We mainly feature projects created by Script_luno. If you would like your project to be featured, please feel free to request it in the studio comments! We may also ask to feature your work.",
+                modalBody: `
+                    <div class="space-y-5">
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                            <h4 class="font-bold text-amber-900 mb-2">Rule Article 1: Participation Rules</h4>
+                            <p class="font-semibold text-amber-800 text-sm">Section 1: About the Studio</p>
+                            <p class="text-xs text-amber-700">This studio is for technical Scratch projects with 100 blocks or less.</p>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-slate-800 mb-1 text-sm">Section 2: Criteria for Removal</h5>
+                            <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
+                                <li>Projects with 101+ blocks, no scripts, simple image toggles, 1-step movement, or music only will be removed.</li>
+                                <li>If a non-compliant project is found, a notice will be posted in its comments. If there's no response within 1 week, it will be removed.</li>
+                            </ul>
+                        </div>
+                        <div class="relative py-2 flex items-center justify-center">
+                            <div class="border-t-2 border-dashed border-slate-200 w-full"></div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                            <h4 class="font-bold text-blue-900 mb-1">Rule Article 2: Curators & Managers</h4>
+                            <p class="text-xs text-blue-800">Anyone is free to add projects as long as they follow Article 1.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentLang = 'ja';
+        let growthChartInstance = null;
+
+        // 注目の作品リストの描画
+        function renderFeaturedProjects(lang) {
+            const container = document.getElementById('featuredProjectsContainer');
+            if (!container) return;
+
+            let html = '';
+            const projects = STUDIO_DATA.featuredProjects;
+
+            for (const [title, details] of Object.entries(projects)) {
+                const desc = details.desc ? (details.desc[lang] || details.desc['ja'] || '') : '';
+                const url = `https://scratch.mit.edu/projects/${details.id}/`;
+
+                html += `
+                <a href="${url}" target="_blank" rel="noopener noreferrer" class="group bg-slate-50 hover:bg-emerald-50/50 border border-slate-200/80 hover:border-emerald-300 rounded-xl p-4 transition duration-200 flex flex-col justify-between shadow-sm hover:shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-slate-800 group-hover:text-emerald-700 transition text-base sm:text-lg flex items-center space-x-1.5">
+                                <span>🧩</span>
+                                <span>${title}</span>
+                            </h3>
+                            <span class="text-slate-400 group-hover:text-emerald-600 transition text-xs font-bold shrink-0 ml-2">↗</span>
+                        </div>
+                        <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">${desc}</p>
+                    </div>
+                </a>
+                `;
+            }
+
+            container.innerHTML = html;
         }
 
-        fetchScratchData();
-    </script>
+        // 日付文字列を比較用の数値（月*100 + 日）に変換
+        function parseDateKey(dateStr) {
+            let clean = dateStr.replace('月', '/').replace('日', '').replace(/\?/g, '15').replace(/XX/g, '15');
+            let parts = clean.split('/');
+            if (parts.length === 2) {
+                let m = parseInt(parts[0]) || 1;
+                let d = parseInt(parts[1]) || 15;
+                return m * 100 + d;
+            }
+            return 0;
+        }
 
+        // 歴史タイムラインの動的生成
+        function renderHistory(lang) {
+            const historyContainer = document.querySelector('.border-l-2.border-emerald-400');
+            if (!historyContainer) return;
+
+            let html = '';
+            STUDIO_DATA.history.forEach(item => {
+                const text = lang === 'ja' ? item.ja : item.en;
+                const isHighlight = item.ja.includes('🎉') || item.ja.includes('💬') || item.ja.includes('公式サイト');
+                const badgeClass = isHighlight ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600';
+                
+                html += `
+                <div class="relative group">
+                    <div class="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-white"></div>
+                    <span class="inline-block px-2.5 py-0.5 rounded text-xs font-semibold ${badgeClass} mb-1">${item.date}</span>
+                    <p class="text-slate-700 font-medium text-sm sm:text-base">${text}</p>
+                </div>
+                `;
+            });
+            historyContainer.innerHTML = html;
+        }
+
+        // グラフと平均増加ペースのレンダリング
+        function renderGrowthChart(lang) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+
+            const allDateKeys = Array.from(new Set([
+                ...Object.keys(STUDIO_DATA.projects),
+                ...Object.keys(STUDIO_DATA.comments)
+            ])).sort((a, b) => parseDateKey(a) - parseDateKey(b));
+
+            const labels = allDateKeys.map(k => k.replace('?', 'XX'));
+
+            function interpolateData(dataObj, keys) {
+                let lastVal = 0;
+                return keys.map(k => {
+                    if (dataObj[k] !== undefined) {
+                        lastVal = dataObj[k];
+                        return lastVal;
+                    }
+                    return lastVal;
+                });
+            }
+
+            const projectsData = interpolateData(STUDIO_DATA.projects, allDateKeys);
+            const commentsData = interpolateData(STUDIO_DATA.comments, allDateKeys);
+
+            const pLabel = i18nData[lang].chartLabelProjects;
+            const cLabel = i18nData[lang].chartLabelComments;
+
+            if (growthChartInstance) {
+                growthChartInstance.destroy();
+            }
+
+            growthChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: pLabel,
+                            data: projectsData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#059669'
+                        },
+                        {
+                            label: cLabel,
+                            data: commentsData,
+                            borderColor: '#0284c7',
+                            backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0369a1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 言語切り替え関数
+        function switchLanguage(lang) {
+            currentLang = lang;
+            const data = i18nData[lang];
+
+            document.title = data.pageTitle;
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (data[key]) {
+                    el.innerHTML = data[key];
+                }
+            });
+
+            document.getElementById('modalContent').innerHTML = data.modalBody;
+
+            const jaBtn = document.getElementById('langJaBtn');
+            const enBtn = document.getElementById('langEnBtn');
+
+            if (lang === 'ja') {
+                jaBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm";
+                enBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20";
+                document.documentElement.lang = "ja";
+            } else {
+                enBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm";
+                jaBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20";
+                document.documentElement.lang = "en";
+            }
+
+            renderHistory(lang);
+            renderGrowthChart(lang);
+            renderFeaturedProjects(lang);
+        }
+
+        // モーダルの開閉
+        function toggleRuleModal() {
+            const modal = document.getElementById('ruleModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // 初期化
+        window.onload = function() {
+            switchLanguage('ja');
+        };
+    </script>
 </body>
 </html>
