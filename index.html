@@ -227,9 +227,114 @@
     <script>
         // =========================================================================
         // ✏️ 手動で簡単に書き換えられるデータ設定エリア (STUDIO_DATA)
-        // ここを編集するだけで、歴史一覧・グラフ・1週間の平均数がすべて自動更新されます！
+        // ここを編集するだけで、歴史一覧・グラフ・1週間の平均数・ルール本文がすべて自動更新されます！
         // =========================================================================
         const STUDIO_DATA = {
+            // 📜 スタジオルールデータ（ここを書き換えることでルールを簡単に変更・追加できます）
+            rules: {
+                ja: [
+                    {
+                        article: "スタジオルール第1条 参加ルールについて",
+                        color: "amber",
+                        sections: [
+                            { title: "第一項 スタジオについて", content: "このスタジオは、100ブロック以下の技術的な作品を入れるスタジオである。" },
+                            { 
+                                title: "第二項 外す基準・外す場合の行動について", 
+                                list: [
+                                    "101ブロック以上/プログラム無し/画像の切り替えのみ/1歩動かす/回転のみ/音楽のみ等のシンプルすぎるものはスタジオから外す対象になります。",
+                                    "対象作品を見つけた場合、その作品のコメント欄に報告し、1週間反応がない場合スタジオから外させてもらいます。（コメント欄閉鎖時等は「100ブロックで作ってみた会場 報告用作品」へ報告）",
+                                    "今後スタジオのルールの変更をする場合があります。ルール変更前にスタジオのコメント欄にコメントして、投稿から1週間後に変更します。"
+                                ]
+                            },
+                            {
+                                title: "第三項 コメントについて",
+                                list: [
+                                    "100ブロック化『挑戦中』の相談OK！未完成作品のURLを貼って相談してね！",
+                                    "作品の宣伝は当スタジオに追加されている作品なら自由です。",
+                                    "雑談や依頼もご自由にどうぞ。"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        article: "スタジオルール第2条 キュレーター・マネージャーについて",
+                        color: "blue",
+                        sections: [
+                            { title: "第一項 作品の追加について", content: "作品の追加は誰でもルールを守れば自由です。" },
+                            { 
+                                title: "第二項 キュレーター・マネージャーの仕事", 
+                                list: [
+                                    "キュレーター・マネージャーの仕事は任意とし、作品追加時のルール確認等を行っていただけると助かります。"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        article: "スタジオルール第3条 作品の管理・アップデートについて",
+                        color: "emerald",
+                        sections: [
+                            { 
+                                title: "第一項 作品のバンプについて", 
+                                subSections: [
+                                    { num: "第一号", text: "作品をアップデートしたら、当スタジオに作品を入れ直して一番上に移動させてOK" },
+                                    { num: "第二号", text: "バージョンアップごとに作品を分けている場合、過去バージョンは消さなくてもOK" }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                en: [
+                    {
+                        article: "Rule Article 1: Participation Rules",
+                        color: "amber",
+                        sections: [
+                            { title: "Section 1: About the Studio", content: "This studio is for technical Scratch projects with 100 blocks or less." },
+                            { 
+                                title: "Section 2: Criteria for Removal", 
+                                list: [
+                                    "Projects with 101+ blocks, no scripts, simple image toggles, 1-step movement, or music only will be removed.",
+                                    "If a non-compliant project is found, a notice will be posted in its comments. If there's no response within 1 week, it will be removed."
+                                ]
+                            },
+                            {
+                                title: "Section 3: Comments",
+                                list: [
+                                    "Optimization help for projects in progress is welcome!",
+                                    "You may promote projects already in this studio.",
+                                    "Casual chat and requests are free to post."
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        article: "Rule Article 2: Curators & Managers",
+                        color: "blue",
+                        sections: [
+                            { title: "Section 1: Adding Projects", content: "Anyone is free to add projects as long as they follow Article 1." },
+                            { 
+                                title: "Section 2: Roles", 
+                                list: [
+                                    "Curators and managers help check project rules on a voluntary basis."
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        article: "Rule Article 3: Project Updates & Bumping",
+                        color: "emerald",
+                        sections: [
+                            { 
+                                title: "Section 1: Project Bumping", 
+                                subSections: [
+                                    { num: "1.", text: "When updating a project, you may re-add it to bump it to the top of the studio." },
+                                    { num: "2.", text: "If separate projects are created for each version update, older versions do not need to be deleted." }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
             // 📜 スタジオの歴史データ
             history: [
                 { date: "6月1日", ja: "スタジオ作成 ＆ 初めての作品「電卓96ブロック」を追加！", en: "Studio Created & First Project '96-block Calculator' Added!" },
@@ -354,61 +459,11 @@
                 modalTitle: "スタジオルール全文",
                 closeBtn: "閉じる",
                 chartLabelProjects: "作品数",
-                chartLabelComments: "コメント数",
-                featuredTitle: "注目の作品",
-                featuredNotice: "※基本的にScript_lunoの作品を中心に掲載しておりますが、「自分の作品も掲載してほしい！」という方は、スタジオのコメント欄にてお気軽にお知らせください。また、こちらから掲載のお願いをさせていただく場合もございます。",
-                modalBody: `
-                    <div class="space-y-5">
-                        <!-- 第1条 -->
-                        <div class="space-y-4">
-                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                                <h4 class="font-bold text-amber-900 mb-2">スタジオルール第1条 参加ルールについて</h4>
-                                <p class="font-semibold text-amber-800 text-sm">第一項 スタジオについて</p>
-                                <p class="text-xs text-amber-700">このスタジオは、100ブロック以下の技術的な作品を入れるスタジオである。</p>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第二項 外す基準・外す場合の行動について</h5>
-                                <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
-                                    <li>101ブロック以上/プログラム無し/画像の切り替えのみ/1歩動かす/回転のみ/音楽のみ等のシンプルすぎるものはスタジオから外す対象になります。</li>
-                                    <li>対象作品を見つけた場合、その作品のコメント欄に報告し、1週間反応がない場合スタジオから外させてもらいます。（コメント欄閉鎖時等は「100ブロックで作ってみた会場 報告用作品」へ報告）</li>
-                                    <li>今後スタジオのルールの変更をする場合があります。ルール変更前にスタジオのコメント欄にコメントして、投稿から1週間後に変更します。</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第三項 コメントについて</h5>
-                                <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
-                                    <li>100ブロック化『挑戦中』の相談OK！未完成作品のURLを貼って相談してね！</li>
-                                    <li>作品の宣伝は当スタジオに追加されている作品なら自由です。</li>
-                                    <li>雑談や依頼もご自由にどうぞ。</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 第一条と第二条の間の区切り線 -->
-                        <div class="relative py-2 flex items-center justify-center">
-                            <div class="border-t-2 border-dashed border-slate-200 w-full"></div>
-                        </div>
-
-                        <!-- 第2条 -->
-                        <div class="space-y-3">
-                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                                <h4 class="font-bold text-blue-900 mb-1">スタジオルール第2条 キュレーター・マネージャーについて</h4>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第一項 作品の追加について</h5>
-                                <p class="text-xs text-slate-600 pl-1">作品の追加は誰でもルールを守れば自由です。</p>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 mb-1 text-sm">第二項 キュレーター・マネージャーの仕事</h5>
-                                <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
-                                    <li>キュレーター・マネージャーの仕事は任意とし、作品追加時のルール確認等を行っていただけると助かります。</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            en: {
+            chartLabelComments: "コメント数",
+            featuredTitle: "注目の作品",
+            featuredNotice: "※基本的にScript_lunoの作品を中心に掲載しておりますが、「自分の作品も掲載してほしい！」という方は、スタジオのコメント欄にてお気軽にお知らせください。また、こちらから掲載のお願いをさせていただく場合もございます。"
+        },
+        en: {
                 pageTitle: "Made with 100 Blocks Studio.com",
                 siteTitle: "Made with 100 Blocks Studio",
                 heroTitle: "Challenge the Limits of Tech & Ideas!",
@@ -436,40 +491,83 @@
                 modalTitle: "Full Studio Rules",
                 closeBtn: "Close",
                 chartLabelProjects: "Projects",
-                chartLabelComments: "Comments",
-                featuredTitle: "Featured Projects",
-                featuredNotice: "*We mainly feature projects created by Script_luno. If you would like your project to be featured, please feel free to request it in the studio comments! We may also ask to feature your work.",
-                modalBody: `
-                    <div class="space-y-5">
-                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                            <h4 class="font-bold text-amber-900 mb-2">Rule Article 1: Participation Rules</h4>
-                            <p class="font-semibold text-amber-800 text-sm">Section 1: About the Studio</p>
-                            <p class="text-xs text-amber-700">This studio is for technical Scratch projects with 100 blocks or less.</p>
-                        </div>
-                        <div>
-                            <h5 class="font-bold text-slate-800 mb-1 text-sm">Section 2: Criteria for Removal</h5>
-                            <ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">
-                                <li>Projects with 101+ blocks, no scripts, simple image toggles, 1-step movement, or music only will be removed.</li>
-                                <li>If a non-compliant project is found, a notice will be posted in its comments. If there's no response within 1 week, it will be removed.</li>
-                            </ul>
-                        </div>
-                        <div class="relative py-2 flex items-center justify-center">
-                            <div class="border-t-2 border-dashed border-slate-200 w-full"></div>
-                        </div>
-                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                            <h4 class="font-bold text-blue-900 mb-1">Rule Article 2: Curators & Managers</h4>
-                            <p class="text-xs text-blue-800">Anyone is free to add projects as long as they follow Article 1.</p>
-                        </div>
-                    </div>
-                `
+            chartLabelComments: "Comments",
+            featuredTitle: "Featured Projects",
+            featuredNotice: "*We mainly feature projects created by Script_luno. If you would like your project to be featured, please feel free to request it in the studio comments! We may also ask to feature your work."
+        }
+    };
+
+    let currentLang = 'ja';
+    let growthChartInstance = null;
+
+    // モーダルルール文の動的生成関数
+    function renderModalRules(lang) {
+        const modalContent = document.getElementById('modalContent');
+        if (!modalContent || !STUDIO_DATA.rules || !STUDIO_DATA.rules[lang]) return;
+
+        const rulesData = STUDIO_DATA.rules[lang];
+        let html = '<div class="space-y-5">';
+
+        rulesData.forEach((rule, index) => {
+            if (index > 0) {
+                html += `
+                <div class="relative py-2 flex items-center justify-center">
+                    <div class="border-t-2 border-dashed border-slate-200 w-full"></div>
+                </div>
+                `;
             }
-        };
 
-        let currentLang = 'ja';
-        let growthChartInstance = null;
+            const colorBg = rule.color === 'amber' ? 'bg-amber-50 border-amber-200 text-amber-900' : 
+                            rule.color === 'blue' ? 'bg-blue-50 border-blue-200 text-blue-900' : 
+                            'bg-emerald-50 border-emerald-200 text-emerald-900';
 
-        // 注目の作品リストの描画
-        function renderFeaturedProjects(lang) {
+            html += `
+            <div class="space-y-4">
+                <div class="${colorBg} p-4 rounded-xl border">
+                    <h4 class="font-bold mb-1">${rule.article}</h4>
+                </div>
+            `;
+
+            rule.sections.forEach(sec => {
+                html += `<div><h5 class="font-bold text-slate-800 mb-1 text-sm">${sec.title}</h5>`;
+                
+                if (sec.content) {
+                    html += `<p class="text-xs text-slate-600 pl-1">${sec.content}</p>`;
+                }
+                
+                if (sec.list) {
+                    html += `<ul class="list-disc list-inside text-xs space-y-1 text-slate-600 pl-1">`;
+                    sec.list.forEach(item => {
+                        html += `<li>${item}</li>`;
+                    });
+                    html += `</ul>`;
+                }
+
+                if (sec.subSections) {
+                    html += `<div class="space-y-1.5 pl-1">`;
+                    sec.subSections.forEach(sub => {
+                        html += `
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70 text-xs text-slate-700">
+                            <span class="font-bold text-emerald-700 mr-1">${sub.num}</span>
+                            <span>${sub.text}</span>
+                        </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            html += `</div>`;
+        });
+
+        html += '</div>';
+        modalContent.innerHTML = html;
+    }
+
+    // 注目の作品リストの描画
+    function renderFeaturedProjects(lang) {
             const container = document.getElementById('featuredProjectsContainer');
             if (!container) return;
 
@@ -630,21 +728,22 @@
             const enBtn = document.getElementById('langEnBtn');
 
             if (lang === 'ja') {
-                jaBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm";
-                enBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20";
-                document.documentElement.lang = "ja";
-            } else {
-                enBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm";
-                jaBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20";
-                document.documentElement.lang = "en";
-            }
-
-            renderHistory(lang);
-            renderGrowthChart(lang);
-            renderFeaturedProjects(lang);
+            jaBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm";
+            enBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20";
+            document.documentElement.lang = "ja";
+        } else {
+            enBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-emerald-700 shadow-sm";
+            jaBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded-lg transition text-white hover:bg-white/20";
+            document.documentElement.lang = "en";
         }
 
-        // モーダルの開閉
+        renderModalRules(lang);
+        renderHistory(lang);
+        renderGrowthChart(lang);
+        renderFeaturedProjects(lang);
+    }
+
+    // モーダルの開閉
         function toggleRuleModal() {
             const modal = document.getElementById('ruleModal');
             modal.classList.toggle('hidden');
